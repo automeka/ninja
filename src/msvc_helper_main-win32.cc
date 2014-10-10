@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifdef _WIN32
+
 #include "msvc_helper.h"
 
 #include <fcntl.h>
@@ -143,3 +145,5 @@ int MSVCHelperMain(int argc, char** argv) {
 
   return exit_code;
 }
+
+#endif  // _WIN32

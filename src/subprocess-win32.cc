@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifdef _WIN32
+
 #include "subprocess.h"
 
 #include <assert.h>
@@ -290,3 +292,5 @@ void SubprocessSet::Clear() {
     delete *i;
   running_.clear();
 }
+
+#endif  // _WIN32

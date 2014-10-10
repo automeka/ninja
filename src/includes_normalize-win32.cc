@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifdef _WIN32
+
 #include "includes_normalize.h"
 
 #include "string_piece.h"
@@ -114,3 +116,5 @@ string IncludesNormalize::Normalize(const string& input,
     return partially_fixed.AsString();
   return Relativize(partially_fixed, relative_to);
 }
+
+#endif  // _WIN32

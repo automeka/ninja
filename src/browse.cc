@@ -18,7 +18,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "../build/browse_py.h"
+#include "browse_py.h"
+
+#ifndef NINJA_PYTHON
+#define NINJA_PYTHON "python2.7"
+#endif
 
 void RunBrowsePython(State* state, const char* ninja_command,
                      const char* initial_target) {

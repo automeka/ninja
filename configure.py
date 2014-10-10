@@ -432,11 +432,11 @@ if has_re2c():
            command='re2c -b -i --no-generation-date -o $out $in',
            description='RE2C $out')
     # Generate the .cc files in the source directory so we can check them in.
-    n.build(src('depfile_parser.cc'), 're2c', src('depfile_parser.in.cc'))
-    n.build(src('lexer.cc'), 're2c', src('lexer.in.cc'))
+    n.build(src('depfile_parser.cc'), 're2c', src('depfile_parser.cc.in'))
+    n.build(src('lexer.cc'), 're2c', src('lexer.cc.in'))
 else:
     print("warning: A compatible version of re2c (>= 0.11.3) was not found; "
-           "changes to src/*.in.cc will not affect your build.")
+           "changes to src/*.cc.in will not affect your build.")
 n.newline()
 
 n.comment('Core source files all build into ninja library.')
