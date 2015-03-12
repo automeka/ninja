@@ -1,0 +1,6 @@
+module ninja {
+  umbrella "."
+  exclude header "getopt.h"
+  link "ninja"
+  export *
+}

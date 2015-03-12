@@ -25,6 +25,8 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <direct.h>  // _mkdir
+#else
+#include <fcntl.h>
 #endif
 
 #include "util.h"

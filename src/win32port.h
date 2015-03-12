@@ -15,6 +15,8 @@
 #ifndef NINJA_WIN32PORT_H_
 #define NINJA_WIN32PORT_H_
 
+#ifdef _WIN32
+
 typedef signed short int16_t;
 typedef unsigned short uint16_t;
 /// A 64-bit integer type
@@ -25,6 +27,8 @@ typedef unsigned long long uint64_t;
 #ifndef PRIu64
 #define PRIu64 "I64u"
 #define PRIx64 "I64x"
+#endif
+
 #endif
 
 #endif // NINJA_WIN32PORT_H_
