@@ -57,10 +57,10 @@ namespace std {
 template<>
 struct hash<StringPiece> {
   typedef StringPiece argument_type;
-  typedef std::size_t result_type;
+  typedef size_t result_type;
 
-  result_type operator()(argument_type const& s) const {
-    return MurmurHash2(s.str_, s.len_);
+  size_t operator()(StringPiece key) const {
+    return MurmurHash2(key.str_, key.len_);
   }
 };
 }
@@ -76,7 +76,7 @@ struct StringPieceCmp : public hash_compare<StringPiece> {
     return MurmurHash2(key.str_, key.len_);
   }
   bool operator()(const StringPiece& a, const StringPiece& b) const {
-    int cmp = strncmp(a.str_, b.str_, min(a.len_, b.len_));
+    int cmp = memcmp(a.str_, b.str_, min(a.len_, b.len_));
     if (cmp < 0) {
       return true;
     } else if (cmp > 0) {
@@ -88,26 +88,17 @@ struct StringPieceCmp : public hash_compare<StringPiece> {
 };
 
 #else
-
 #include <ext/hash_map>
 
 using __gnu_cxx::hash_map;
 
 namespace __gnu_cxx {
 template<>
-struct hash<std::string> {
-  size_t operator()(const std::string& s) const {
-    return hash<const char*>()(s.c_str());
-  }
-};
-
-template<>
 struct hash<StringPiece> {
   size_t operator()(StringPiece key) const {
     return MurmurHash2(key.str_, key.len_);
   }
 };
-
 }
 #endif
 

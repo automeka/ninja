@@ -129,7 +129,9 @@ int MSVCHelperMain(int argc, char** argv) {
 
   if (output_filename) {
     CLParser parser;
-    output = parser.Parse(output, deps_prefix);
+    string err;
+    if (!parser.Parse(output, deps_prefix, &output, &err))
+      Fatal("%s\n", err.c_str());
     WriteDepFileOrDie(output_filename, parser);
   }
 

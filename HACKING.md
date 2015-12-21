@@ -2,10 +2,25 @@
 
 `./configure.py` generates the `build.ninja` files used to build
 ninja.  It accepts various flags to adjust build parameters.
+Run './configure.py --help' for more configuration options.
 
 The primary build target of interest is `ninja`, but when hacking on
-Ninja your changes should be testable so it's more useful to build
-and run `ninja_test` when developing.
+Ninja your changes should be testable so it's more useful to build and
+run `ninja_test` when developing.
+
+### Bootstrapping
+
+Ninja is built using itself.  To bootstrap the first binary, run the
+configure script as `./configure.py --bootstrap`.  This first compiles
+all non-test source files together, then re-builds Ninja using itself.
+You should end up with a `ninja` binary (or `ninja.exe`) in the source root.
+
+#### Windows
+
+On Windows, you'll need to install Python to run `configure.py`, and
+run everything under a Visual Studio Tools Command Prompt (or after
+running `vcvarsall` in a normal command prompt).  See below if you
+want to use mingw or some other compiler instead of Visual Studio.
 
 ### Adjusting build flags
 
@@ -38,7 +53,7 @@ obvious exceptions (fixing typos in comments don't need tests).
 
 I am very wary of changes that increase the complexity of Ninja (in
 particular, new build file syntax or command-line flags) or increase
-the maintenance burden of Ninja.  Ninja is already successfully in use
+the maintenance burden of Ninja.  Ninja is already successfully used
 by hundreds of developers for large projects and it already achieves
 (most of) the goals I set out for it to do.  It's probably best to
 discuss new feature ideas on the mailing list before I shoot down your
@@ -59,7 +74,7 @@ build "all" before committing to verify the other source still works!
 ## Testing performance impact of changes
 
 If you have a Chrome build handy, it's a good test case.  Otherwise,
-[the github downoads page](https://github.com/martine/ninja/downloads)
+[the github downoads page](https://github.com/ninja-build/ninja/releases)
 has a copy of the Chrome build files (and depfiles). You can untar
 that, then run
 
@@ -161,3 +176,49 @@ The trick is to install just the compilers, and not all of Visual Studio,
 by following [these instructions][win7sdk].
 
 [win7sdk]: http://www.kegel.com/wine/cl-howto-win7sdk.html
+
+### Using gcov
+
+Do a clean debug build with the right flags:
+
+    CFLAGS=-coverage LDFLAGS=-coverage ./configure.py --debug
+    ninja -t clean ninja_test && ninja ninja_test
+
+Run the test binary to generate `.gcda` and `.gcno` files in the build
+directory, then run gcov on the .o files to generate `.gcov` files in the
+root directory:
+
+    ./ninja_test
+    gcov build/*.o
+
+Look at the generated `.gcov` files directly, or use your favorite gcov viewer.
+
+### Using afl-fuzz
+
+Build with afl-clang++:
+
+    CXX=path/to/afl-1.20b/afl-clang++ ./configure.py
+    ninja
+
+Then run afl-fuzz like so:
+
+    afl-fuzz -i misc/afl-fuzz -o /tmp/afl-fuzz-out ./ninja -n -f @@
+
+You can pass `-x misc/afl-fuzz-tokens` to use the token dictionary. In my
+testing, that did not seem more effective though.
+
+#### Using afl-fuzz with asan
+
+If you want to use asan (the `isysroot` bit is only needed on OS X; if clang
+can't find C++ standard headers make sure your LLVM checkout includes a libc++
+checkout and has libc++ installed in the build directory):
+
+    CFLAGS="-fsanitize=address -isysroot $(xcrun -show-sdk-path)" \
+        LDFLAGS=-fsanitize=address CXX=path/to/afl-1.20b/afl-clang++ \
+        ./configure.py
+    AFL_CXX=path/to/clang++ ninja
+
+Make sure ninja can find the asan runtime:
+
+    DYLD_LIBRARY_PATH=path/to//lib/clang/3.7.0/lib/darwin/ \
+        afl-fuzz -i misc/afl-fuzz -o /tmp/afl-fuzz-out ./ninja -n -f @@

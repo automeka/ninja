@@ -1,6 +1,5 @@
-Ninja
-=====
-Evan Martin <martine@danga.com>
+The Ninja build system
+======================
 
 
 Introduction
@@ -598,6 +597,11 @@ rule cc
   command = cl /showIncludes -c $in /Fo$out
 ----
 
+If the include directory directives are using absolute paths, your depfile
+may result in a mixture of relative and absolute paths. Paths used by other
+build rules need to match exactly. Therefore, it is recommended to use
+relative paths in these cases.
+
 [[ref_pool]]
 Pools
 ~~~~~
@@ -713,7 +717,6 @@ spaces within a token must be escaped.
 There is only one escape character, `$`, and it has the following
 behaviors:
 
-[horizontal]
 `$` followed by a newline:: escape the newline (continue the current line
 across a line break).
 
@@ -889,6 +892,9 @@ header file before starting a subsequent compilation step.  (Once the
 header is used in compilation, a generated dependency file will then
 express the implicit dependency.)
 
+File paths are compared as is, which means that an absolute path and a
+relative path, pointing to the same file, are considered different by Ninja.
+
 Variable expansion
 ~~~~~~~~~~~~~~~~~~
 
@@ -920,9 +926,12 @@ Evaluation and scoping
 
 Top-level variable declarations are scoped to the file they occur in.
 
+Rule declarations are also scoped to the file they occur in.
+_(Available since Ninja 1.6)_
+
 The `subninja` keyword, used to include another `.ninja` file,
 introduces a new scope.  The included `subninja` file may use the
-variables from the parent file, and shadow their values for the file's
+variables and rules from the parent file, and shadow their values for the file's
 scope, but it won't affect values of the variables in the parent.
 
 To include another `.ninja` file in the current scope, much like a C
